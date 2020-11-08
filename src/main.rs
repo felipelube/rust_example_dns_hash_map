@@ -114,6 +114,57 @@ fn remove_dns_server(dns_servers: &mut HashMap<String, (String, String)>) -> () 
     }
 }
 
+fn update_dns_server(dns_servers: &mut HashMap<String, (String, String)>) -> () {
+    loop {
+        let mut name = String::new();
+        println!("Digite o nome do provedor");
+        io::stdin()
+            .read_line(&mut name)
+            .expect("Falha ao ler do console");
+        if name.trim().len() == 0 {
+            println!("Entrada inválida, tente novamente.");
+            continue;
+        }
+        let name = name.trim();
+        match dns_servers.get(name) {
+            Some(_) => {
+                let mut address0 = String::new();
+                let mut address1 = String::new();
+                println!("Atualize os servidores do provedor {}", name);
+                println!("Digite o primeiro endereço");
+                io::stdin()
+                    .read_line(&mut address0)
+                    .expect("Falha ao ler do console");
+                if address0.trim().len() == 0 {
+                    println!("Entrada inválida, tente novamente.");
+                    continue;
+                }
+
+                println!("Digite o segundo endereço");
+                io::stdin()
+                    .read_line(&mut address1)
+                    .expect("Falha ao ler do console");
+                if address1.trim().len() == 0 {
+                    println!("Entrada inválida, tente novamente.");
+                    continue;
+                }
+                dns_servers.insert(
+                    name.to_string(),
+                    (address0.trim().to_string(), address1.trim().to_string()),
+                );
+                break;
+            }
+            None => {
+                println!(
+                    "Não existe servidor DNS cadastrado com este nome: {}. Tente novamente\n",
+                    &name
+                );
+                continue;
+            }
+        }
+    }
+}
+
 fn main() {
     //
     let mut dns_servers = HashMap::new();
@@ -138,7 +189,7 @@ fn main() {
             1 => display_dns_servers(&dns_servers),
             2 => add_new_dns_server(&mut dns_servers),
             3 => remove_dns_server(&mut dns_servers),
-            4 => { /*TODO: Alterar um servidor DNS*/ }
+            4 => update_dns_server(&mut dns_servers),
             _ => { /* TODO: Sair*/ }
         }
         if option == 5 {
