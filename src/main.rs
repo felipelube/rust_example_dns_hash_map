@@ -190,10 +190,10 @@ fn main() {
             2 => add_new_dns_server(&mut dns_servers),
             3 => remove_dns_server(&mut dns_servers),
             4 => update_dns_server(&mut dns_servers),
-            _ => { /* TODO: Sair*/ }
-        }
-        if option == 5 {
-            break;
+            _ => {
+                println!("Tchau!");
+                break;
+            }
         }
     }
 }
