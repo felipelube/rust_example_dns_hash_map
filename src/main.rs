@@ -32,6 +32,16 @@ fn get_main_option() -> u32 {
     }
 }
 
+fn display_dns_servers(dns_servers: &HashMap<&str, (&str, &str)>) -> () {
+    if dns_servers.len() > 0 {
+        for (name, addresses) in dns_servers {
+            println!("Servidor DNS \"{}\" com os endereços {:?}", name, addresses)
+        }
+    } else {
+        println!("Não há servidores DNS cadastrados.")
+    }
+}
+
 fn main() {
     //
     let mut dns_servers = HashMap::new();
@@ -44,7 +54,7 @@ fn main() {
     loop {
         let option = get_main_option();
         match option {
-            1 => { /*TODO: Listar os servidores DNS*/ }
+            1 => display_dns_servers(&dns_servers),
             2 => { /*TODO: Adicionar um novo servidor DNS*/ }
             3 => { /*TODO: Remover um servidor DNS*/ }
             4 => { /*TODO: Alterar um servidor DNS*/ }
