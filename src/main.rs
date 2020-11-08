@@ -32,7 +32,7 @@ fn get_main_option() -> u32 {
     }
 }
 
-fn display_dns_servers(dns_servers: &HashMap<String, (String, String)>) -> () {
+fn display_dns_servers(dns_servers: &HashMap<String, Vec<String>>) -> () {
     if dns_servers.len() > 0 {
         for (name, addresses) in dns_servers {
             println!("Servidor DNS \"{}\" com os endereços {:?}", name, addresses)
@@ -42,11 +42,37 @@ fn display_dns_servers(dns_servers: &HashMap<String, (String, String)>) -> () {
     }
 }
 
-fn add_new_dns_server(dns_servers: &mut HashMap<String, (String, String)>) -> () {
+fn get_addresses_for_server(len: usize) -> Vec<String> {
+    let mut addresses: Vec<String> = Vec::with_capacity(len);
     loop {
+        let mut address = String::new();
+        println!(
+            "Digite o endereço do servidor {}",
+            if addresses.len() > 0 {
+                "secundário"
+            } else {
+                "primário"
+            }
+        );
+        io::stdin()
+            .read_line(&mut address)
+            .expect("Falha ao ler do console");
+        let address = address.trim();
+        if address.len() == 0 {
+            println!("Entrada inválida, tente novamente.");
+            continue;
+        }
+        addresses.push(address.to_string());
+        if addresses.len() == len {
+            break;
+        }
+    }
+    return addresses;
+}
+
+fn add_new_dns_server(dns_servers: &mut HashMap<String, Vec<String>>) -> () {
+    'fora: loop {
         let mut name = String::new();
-        let mut address0 = String::new();
-        let mut address1 = String::new();
 
         println!("Digite o nome do provedor");
         io::stdin()
@@ -57,32 +83,13 @@ fn add_new_dns_server(dns_servers: &mut HashMap<String, (String, String)>) -> ()
             continue;
         }
 
-        println!("Digite o primeiro endereço");
-        io::stdin()
-            .read_line(&mut address0)
-            .expect("Falha ao ler do console");
-        if address0.trim().len() == 0 {
-            println!("Entrada inválida, tente novamente.");
-            continue;
-        }
-
-        println!("Digite o segundo endereço");
-        io::stdin()
-            .read_line(&mut address1)
-            .expect("Falha ao ler do console");
-        if address1.trim().len() == 0 {
-            println!("Entrada inválida, tente novamente.");
-            continue;
-        }
-        dns_servers.insert(
-            name.trim().to_string(),
-            (address0.trim().to_string(), address1.trim().to_string()),
-        );
+        let addresses = get_addresses_for_server(2);
+        dns_servers.insert(name.trim().to_string(), addresses);
         break;
     }
 }
 
-fn remove_dns_server(dns_servers: &mut HashMap<String, (String, String)>) -> () {
+fn remove_dns_server(dns_servers: &mut HashMap<String, Vec<String>>) -> () {
     if dns_servers.len() == 0 {
         println!("Não existem servidores DNS cadastrados.");
         return;
@@ -114,7 +121,7 @@ fn remove_dns_server(dns_servers: &mut HashMap<String, (String, String)>) -> () 
     }
 }
 
-fn update_dns_server(dns_servers: &mut HashMap<String, (String, String)>) -> () {
+fn update_dns_server(dns_servers: &mut HashMap<String, Vec<String>>) -> () {
     loop {
         let mut name = String::new();
         println!("Digite o nome do provedor");
@@ -128,30 +135,8 @@ fn update_dns_server(dns_servers: &mut HashMap<String, (String, String)>) -> () 
         let name = name.trim();
         match dns_servers.get(name) {
             Some(_) => {
-                let mut address0 = String::new();
-                let mut address1 = String::new();
-                println!("Atualize os servidores do provedor {}", name);
-                println!("Digite o primeiro endereço");
-                io::stdin()
-                    .read_line(&mut address0)
-                    .expect("Falha ao ler do console");
-                if address0.trim().len() == 0 {
-                    println!("Entrada inválida, tente novamente.");
-                    continue;
-                }
-
-                println!("Digite o segundo endereço");
-                io::stdin()
-                    .read_line(&mut address1)
-                    .expect("Falha ao ler do console");
-                if address1.trim().len() == 0 {
-                    println!("Entrada inválida, tente novamente.");
-                    continue;
-                }
-                dns_servers.insert(
-                    name.to_string(),
-                    (address0.trim().to_string(), address1.trim().to_string()),
-                );
+                let addresses = get_addresses_for_server(2);
+                dns_servers.insert(name.to_string(), addresses);
                 break;
             }
             None => {
@@ -170,15 +155,15 @@ fn main() {
     let mut dns_servers = HashMap::new();
     dns_servers.insert(
         "Cloudflare".to_string(),
-        ("1.1.1.1".to_string(), "1.0.0.1".to_string()),
+        vec!["1.1.1.1".to_string(), "1.0.0.1".to_string()],
     );
     dns_servers.insert(
         "Google".to_string(),
-        ("8.8.8.8".to_string(), "8.8.4.4".to_string()),
+        vec!["8.8.8.8".to_string(), "8.8.4.4".to_string()],
     );
     dns_servers.insert(
         "OpenDNS".to_string(),
-        ("208.67.222.222".to_string(), "208.67.220.220".to_string()),
+        vec!["208.67.222.222".to_string(), "208.67.220.220".to_string()],
     );
 
     println!("Olá! Este programa gerencia seus servidores DNS.");
