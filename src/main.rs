@@ -133,10 +133,9 @@ fn update_dns_server(dns_servers: &mut HashMap<String, Vec<String>>) -> () {
             continue;
         }
         let name = name.trim();
-        match dns_servers.get(name) {
-            Some(_) => {
-                let addresses = get_addresses_for_server(2);
-                dns_servers.insert(name.to_string(), addresses);
+        match dns_servers.get_mut(name) {
+            Some(addresses) => {
+                *addresses = get_addresses_for_server(2);
                 break;
             }
             None => {
