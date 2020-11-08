@@ -71,7 +71,7 @@ fn get_addresses_for_server(len: usize) -> Vec<String> {
 }
 
 fn add_new_dns_server(dns_servers: &mut HashMap<String, Vec<String>>) -> () {
-    'fora: loop {
+    loop {
         let mut name = String::new();
 
         println!("Digite o nome do provedor");
